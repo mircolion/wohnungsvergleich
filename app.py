@@ -2,6 +2,7 @@ import dash
 from dash import html, dcc, Input, Output, State
 import dash_bootstrap_components as dbc
 import datetime
+import os
 
 # App-Initialisierung mit Bootstrap-Theme
 app = dash.Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP])
@@ -49,6 +50,13 @@ app.layout = dbc.Container([
         dbc.Col([dbc.Label("Anzahl Eigentümer"), dbc.Input(id='eigentumer', type='number', value=10)])
     ]),
 
+    html.Br(),
+
+    # Eingabe Renovationsfonds
+    dbc.Row([
+        dbc.Col([dbc.Label("Renovationsfonds (CHF)"), dbc.Input(id='renovationsfonds', type='number', value=0)])
+    ]),
+
     html.Hr(),
     html.H4("Sanierungsmaßnahmen"),
 
@@ -82,15 +90,16 @@ app.layout = dbc.Container([
     State('baujahr', 'value'),
     State('glasfaser', 'value'),
     State('eigentumer', 'value'),
+    State('renovationsfonds', 'value'),
     *[State(f"{maßnahme.lower()}_check", 'value') for maßnahme in sanierungsmassnahmen.keys()],
     *[State(f"{maßnahme.lower()}_jahr", 'value') for maßnahme in sanierungsmassnahmen.keys()]
 )
-def berechne_preis(n_clicks, flaeche, baujahr, glasfaser, eigentumer, *args):
+def berechne_preis(n_clicks, flaeche, baujahr, glasfaser, eigentumer, renovationsfonds, *args):
     if n_clicks is None:
         return ""
 
-    # Basispreis/m²
-    basispreis = 4000
+    # Basispreis/m² (leicht erhöht zur besseren Marktnähe)
+    basispreis = 4800
 
     # Alter berechnen
     alter = datetime.datetime.now().year - baujahr
@@ -109,8 +118,11 @@ def berechne_preis(n_clicks, flaeche, baujahr, glasfaser, eigentumer, *args):
             if alter_sanierung <= 10:
                 sanierungsboni += sanierungsmassnahmen[maßnahme] / 100
 
+    # Renovationsfonds-Einfluss (einfaches Beispiel: je 100 CHF +0.01 bonus, gedeckelt auf +0.1)
+    fonds_bonus = min(renovationsfonds / 10000, 0.1)
+
     # Endpreis berechnen
-    preis_pro_m2 = basispreis * (1 - abzug + glasfaser_bonus + sanierungsboni)
+    preis_pro_m2 = basispreis * (1 - abzug + glasfaser_bonus + sanierungsboni + fonds_bonus)
     gesamtpreis = preis_pro_m2 * flaeche
 
     return html.Div([
@@ -119,8 +131,6 @@ def berechne_preis(n_clicks, flaeche, baujahr, glasfaser, eigentumer, *args):
     ])
 
 # App starten
-import os
-
 if __name__ == '__main__':
     app.run(
         debug=False,
