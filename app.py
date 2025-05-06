@@ -27,7 +27,7 @@ app.layout = dbc.Container([
         dbc.Col([
             dbc.Label("Zimmeranzahl"),
             dcc.Slider(
-                id='zimmer', min=1, max=3.5, step=0.5, value=2.5,
+                id='zimmer', min=1, max=4.5, step=0.5, value=2.5,
                 marks={i: str(i) for i in [1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5]}
             )
         ]),
