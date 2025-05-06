@@ -60,12 +60,13 @@ app.layout = html.Div(style=background_style, children=[
 
     html.Br(),
 
+
     dbc.Row([
         dbc.Col([
             dbc.Label("Zimmeranzahl"),
             dcc.Slider(
                 id='zimmer', min=1, max=4.5, step=0.5, value=2.5,
-                marks={i: str(i) for i in [1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5]}
+                marks={i: str(i, tooltip={"always_visible": False, "placement": "bottom"}, className="bg-white") for i in [1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5]}
             )
         ]),
         dbc.Col([dbc.Label("Fläche (m²)"), dbc.Input(id='flaeche', type='number', value=60)])
