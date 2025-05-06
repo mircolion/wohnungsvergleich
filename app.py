@@ -120,4 +120,4 @@ def berechne_preis(n_clicks, flaeche, baujahr, glasfaser, eigentumer, *args):
 
 # App starten
 if __name__ == '__main__':
-    app.run_server(debug=True)
+    app.run(debug=True)
