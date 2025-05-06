@@ -1,11 +1,13 @@
 import dash
 from dash import html, dcc, Input, Output, State
 import dash_bootstrap_components as dbc
+import pandas as pd
 import datetime
 import os
 
-# App-Initialisierung mit Bootstrap-Theme
-app = dash.Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP])
+# CSV mit Bezirken & Preisen laden
+bezirke_df = pd.read_csv("bezirke_ag_so_immobilienpreise.csv")
+bezirksnamen = bezirke_df["Bezirk"].sort_values().tolist()
 
 # Sanierungsmaßnahmen und deren geschätzte Wertsteigerung in Prozent
 sanierungsmassnahmen = {
@@ -17,12 +19,28 @@ sanierungsmassnahmen = {
     'Fassade': 5
 }
 
-# Layout der App mit Formularfeldern und Checklisten
+# App initialisieren
+app = dash.Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP])
+
+# App Layout
 app.layout = dbc.Container([
     html.H1("Wohnungsvergleich mit Sanierungsbewertung"),
     html.Hr(),
 
-    # Erste Eingabereihe: Ort, Zimmeranzahl, Fläche
+    # Bezirkswahl
+    dbc.Row([
+        dbc.Col([
+            dbc.Label("Bezirk wählen"),
+            dcc.Dropdown(
+                id='bezirk',
+                options=[{"label": name, "value": name} for name in bezirksnamen],
+                placeholder="Bezirk auswählen"
+            )
+        ])
+    ]),
+
+    html.Br(),
+
     dbc.Row([
         dbc.Col([dbc.Label("Ort"), dbc.Input(id='ort', type='text', placeholder='z.B. Basel')]),
         dbc.Col([
@@ -37,7 +55,6 @@ app.layout = dbc.Container([
 
     html.Br(),
 
-    # Zweite Eingabereihe: Baujahr, Glasfaser, Eigentümer
     dbc.Row([
         dbc.Col([dbc.Label("Baujahr"), dbc.Input(id='baujahr', type='number', value=1980)]),
         dbc.Col([
@@ -52,7 +69,6 @@ app.layout = dbc.Container([
 
     html.Br(),
 
-    # Eingabe Renovationsfonds
     dbc.Row([
         dbc.Col([dbc.Label("Renovationsfonds (CHF)"), dbc.Input(id='renovationsfonds', type='number', value=0)])
     ]),
@@ -60,7 +76,6 @@ app.layout = dbc.Container([
     html.Hr(),
     html.H4("Sanierungsmaßnahmen"),
 
-    # Eingabe für jede Sanierungsmaßnahme: Checkbox + Jahr
     html.Div([
         dbc.Row([
             dbc.Col([
@@ -82,10 +97,10 @@ app.layout = dbc.Container([
     html.Div(id='ergebnis')
 ])
 
-# Callback-Funktion zur Preisberechnung bei Buttonklick
 @app.callback(
     Output('ergebnis', 'children'),
     Input('berechne', 'n_clicks'),
+    State('bezirk', 'value'),
     State('flaeche', 'value'),
     State('baujahr', 'value'),
     State('glasfaser', 'value'),
@@ -94,21 +109,21 @@ app.layout = dbc.Container([
     *[State(f"{maßnahme.lower()}_check", 'value') for maßnahme in sanierungsmassnahmen.keys()],
     *[State(f"{maßnahme.lower()}_jahr", 'value') for maßnahme in sanierungsmassnahmen.keys()]
 )
-def berechne_preis(n_clicks, flaeche, baujahr, glasfaser, eigentumer, renovationsfonds, *args):
-    if n_clicks is None:
+def berechne_preis(n_clicks, bezirk, flaeche, baujahr, glasfaser, eigentumer, renovationsfonds, *args):
+    if n_clicks is None or bezirk is None:
         return ""
 
-    # Basispreis/m² (leicht erhöht zur besseren Marktnähe)
-    basispreis = 4800
+    # Basispreis aus dem gewählten Bezirk
+    zeile = bezirke_df[bezirke_df["Bezirk"] == bezirk]
+    if zeile.empty:
+        return html.Div("⚠️ Bezirk nicht gefunden.")
+    basispreis = zeile["Preis pro m² (CHF)"].values[0]
 
-    # Alter berechnen
+    # Abschläge und Boni
     alter = datetime.datetime.now().year - baujahr
-    abzug = 0.2 if alter > 30 else 0  # Abschlag bei alten Wohnungen
-
-    # Glasfaserbonus
+    abzug = 0.2 if alter > 30 else 0
     glasfaser_bonus = 0.05 if glasfaser else 0
 
-    # Sanierungsboni berechnen
     sanierungsboni = 0
     for i, maßnahme in enumerate(sanierungsmassnahmen.keys()):
         check = args[i]
@@ -118,10 +133,9 @@ def berechne_preis(n_clicks, flaeche, baujahr, glasfaser, eigentumer, renovation
             if alter_sanierung <= 10:
                 sanierungsboni += sanierungsmassnahmen[maßnahme] / 100
 
-    # Renovationsfonds-Einfluss (einfaches Beispiel: je 100 CHF +0.01 bonus, gedeckelt auf +0.1)
     fonds_bonus = min(renovationsfonds / 10000, 0.1)
 
-    # Endpreis berechnen
+    # Preisberechnung
     preis_pro_m2 = basispreis * (1 - abzug + glasfaser_bonus + sanierungsboni + fonds_bonus)
     gesamtpreis = preis_pro_m2 * flaeche
 
@@ -132,8 +146,4 @@ def berechne_preis(n_clicks, flaeche, baujahr, glasfaser, eigentumer, renovation
 
 # App starten
 if __name__ == '__main__':
-    app.run(
-        debug=False,
-        host='0.0.0.0',
-        port=int(os.environ.get('PORT', 8050))
-    )
+    app.run(debug=False, host='0.0.0.0', port=int(os.environ.get('PORT', 8050)))
