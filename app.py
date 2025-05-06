@@ -148,7 +148,7 @@ app.layout = dbc.Container([
     ]),
 
     html.Br(),
-    dbc.Button("Preis berechnen", id='berechne', color='primary'),
+    dbc.Button("Preis berechnen", id='berechne', color='green'),
     html.Br(), html.Br(),
     html.Div(id='ergebnis')
 ])
