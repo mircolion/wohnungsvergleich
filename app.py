@@ -24,7 +24,7 @@ app = dash.Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP])
 app.title = "Wohnungsvergleich"
 
 background_style = {
-    "backgroundImage": "url('assets/woods.jpg')",
+    "backgroundImage": "url('https://raw.githubusercontent.com/mircolion/wohnungsvergleichmodica/main/woods.jpg')",
     "backgroundSize": "cover",
     "backgroundRepeat": "no-repeat",
     "backgroundPosition": "center",
