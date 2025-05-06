@@ -72,6 +72,63 @@ app.layout = dbc.Container([
         dbc.Col([dbc.Label("Renovationsfonds (CHF)"), dbc.Input(id='renovationsfonds', type='number', value=0)])
     ]),
 
+    html.Br(),
+
+    dbc.Row([
+        dbc.Col([
+            dbc.Label("Waschküche"),
+            dcc.Dropdown(
+                id='waschkueche',
+                options=[
+                    {"label": "In Wohnung individuell", "value": "wohnung"},
+                    {"label": "Geteilte Waschküche", "value": "geteilt"},
+                    {"label": "Eigene Waschküche", "value": "eigen"}
+                ],
+                placeholder="Waschküche auswählen"
+            )
+        ]),
+        dbc.Col([
+            dbc.Label("Parkplatzsituation"),
+            dcc.Dropdown(
+                id='parkplatz',
+                options=[
+                    {"label": "Kein Parkplatz", "value": "kein"},
+                    {"label": "Tiefgaragenparkplatz", "value": "tiefgarage"},
+                    {"label": "Aussenparkplatz", "value": "aussen"}
+                ],
+                placeholder="Parkplatz auswählen"
+            )
+        ])
+    ]),
+
+    html.Br(),
+
+    dbc.Row([
+        dbc.Col([
+            dbc.Label("Kellerabteil"),
+            dcc.Dropdown(
+                id='keller',
+                options=[
+                    {"label": "Kein Kellerabteil", "value": "kein"},
+                    {"label": "Geteilt und abgegrenzt", "value": "geteilt"},
+                    {"label": "Eigenes Kellerabteil", "value": "eigen"}
+                ],
+                placeholder="Kellerabteil auswählen"
+            )
+        ]),
+        dbc.Col([
+            dbc.Label("Estrich"),
+            dcc.Dropdown(
+                id='estrich',
+                options=[
+                    {"label": "Kein Estrich", "value": "kein"},
+                    {"label": "Estrich vorhanden", "value": "vorhanden"}
+                ],
+                placeholder="Estrich auswählen"
+            )
+        ])
+    ]),
+
     html.Hr(),
     html.H4("Sanierungsmaßnahmen"),
 
@@ -105,20 +162,23 @@ app.layout = dbc.Container([
     State('glasfaser', 'value'),
     State('eigentumer', 'value'),
     State('renovationsfonds', 'value'),
+    State('waschkueche', 'value'),
+    State('parkplatz', 'value'),
+    State('keller', 'value'),
+    State('estrich', 'value'),
     *[State(f"{maßnahme.lower()}_check", 'value') for maßnahme in sanierungsmassnahmen.keys()],
     *[State(f"{maßnahme.lower()}_jahr", 'value') for maßnahme in sanierungsmassnahmen.keys()]
 )
-def berechne_preis(n_clicks, bezirk, flaeche, baujahr, glasfaser, eigentumer, renovationsfonds, *args):
+def berechne_preis(n_clicks, bezirk, flaeche, baujahr, glasfaser, eigentumer, renovationsfonds,
+                   waschkueche, parkplatz, keller, estrich, *args):
     if n_clicks is None or bezirk is None:
         return ""
 
-    # Basispreis aus dem gewählten Bezirk
     zeile = bezirke_df[bezirke_df["Bezirk"] == bezirk]
     if zeile.empty:
-        return html.Div("⚠️ Bezirk nicht gefunden.")
+        return html.Div("\u26a0\ufe0f Bezirk nicht gefunden.")
     basispreis = zeile["Preis pro m² (CHF)"].values[0]
 
-    # Abschläge und Boni
     alter = datetime.datetime.now().year - baujahr
     abzug = 0.2 if alter > 30 else 0
     glasfaser_bonus = 0.05 if glasfaser else 0
@@ -134,8 +194,28 @@ def berechne_preis(n_clicks, bezirk, flaeche, baujahr, glasfaser, eigentumer, re
 
     fonds_bonus = min(renovationsfonds / 10000, 0.1)
 
-    # Preisberechnung
-    preis_pro_m2 = basispreis * (1 - abzug + glasfaser_bonus + sanierungsboni + fonds_bonus)
+    # Zusatzboni
+    zusatz_bonus = 0
+
+    if waschkueche == "wohnung":
+        zusatz_bonus += 0.05
+    elif waschkueche == "eigen":
+        zusatz_bonus += 0.03
+
+    if parkplatz == "tiefgarage":
+        zusatz_bonus += 0.05
+    elif parkplatz == "aussen":
+        zusatz_bonus += 0.02
+
+    if keller == "eigen":
+        zusatz_bonus += 0.03
+    elif keller == "geteilt":
+        zusatz_bonus += 0.01
+
+    if estrich == "vorhanden":
+        zusatz_bonus += 0.02
+
+    preis_pro_m2 = basispreis * (1 - abzug + glasfaser_bonus + sanierungsboni + fonds_bonus + zusatz_bonus)
     gesamtpreis = preis_pro_m2 * flaeche
 
     return html.Div([
