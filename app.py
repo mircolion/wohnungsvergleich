@@ -30,13 +30,14 @@ background_style = {
     "backgroundPosition": "center",
     "minHeight": "100vh",
     "padding": "30px",
-    "fontFamily": "Arial Narrow"
+    "fontFamily": "Arial Narrow",
+    "backgroundColor": "rgba(255, 255, 255, 0.25)",
+    "backgroundBlendMode": "lighten"
 }
 
 # App Layout
 app.layout = html.Div(style=background_style, children=[
     html.Div(style={
-        "backgroundBlendMode": "overlay",
         "backgroundColor": "rgba(255,255,255,0.1)",
         "borderRadius": "12px",
         "padding": "20px"
