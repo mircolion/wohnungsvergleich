@@ -24,7 +24,7 @@ app = dash.Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP])
 app.title = "Wohnungsvergleich"
 
 background_style = {
-    "backgroundImage": "url('https://images.unsplash.com/photo-1602749447592-2f8a4e6b0c88?auto=format&fit=crop&w=1950&q=80')",
+    "backgroundImage": "url('https://images.unsplash.com/photo-1508780709619-79562169bc64?auto=format&fit=crop&w=1920&q=60')",
     "backgroundSize": "cover",
     "backgroundRepeat": "no-repeat",
     "backgroundPosition": "center",
@@ -34,7 +34,13 @@ background_style = {
 }
 
 # App Layout
-app.layout = html.Div(children=[dbc.Container([
+app.layout = html.Div(style=background_style, children=[
+    html.Div(style={
+        "backgroundColor": "rgba(255,255,255,0.85)",
+        "borderRadius": "12px",
+        "padding": "20px"
+    }, children=[
+        dbc.Container([
     html.H1("Wohnungsbewertung"),
     html.Hr(),
 
@@ -162,7 +168,9 @@ app.layout = html.Div(children=[dbc.Container([
     dbc.Button("Preis berechnen", id='berechne', color='success', style={"fontFamily": "Arial Narrow"}),
     html.Br(), html.Br(),
     html.Div(id='ergebnis')
-    ])], style=background_style)
+        ])
+    ])
+])
 
 @app.callback(
     Output('ergebnis', 'children'),
