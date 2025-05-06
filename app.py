@@ -21,9 +21,20 @@ sanierungsmassnahmen = {
 
 # App initialisieren
 app = dash.Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP])
+app.title = "Wohnungsvergleich"
+
+background_style = {
+    "backgroundImage": "url('https://images.unsplash.com/photo-1602749447592-2f8a4e6b0c88?auto=format&fit=crop&w=1950&q=80')",
+    "backgroundSize": "cover",
+    "backgroundRepeat": "no-repeat",
+    "backgroundPosition": "center",
+    "minHeight": "100vh",
+    "padding": "30px",
+    "fontFamily": "Arial Narrow"
+}
 
 # App Layout
-app.layout = dbc.Container([
+app.layout = html.Div(children=[dbc.Container([
     html.H1("Wohnungsbewertung"),
     html.Hr(),
 
@@ -151,7 +162,7 @@ app.layout = dbc.Container([
     dbc.Button("Preis berechnen", id='berechne', color='success', style={"fontFamily": "Arial Narrow"}),
     html.Br(), html.Br(),
     html.Div(id='ergebnis')
-])
+    ])], style=background_style)
 
 @app.callback(
     Output('ergebnis', 'children'),
