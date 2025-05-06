@@ -38,7 +38,7 @@ background_style = {
 # App Layout
 app.layout = html.Div(style=background_style, children=[
     html.Div(style={
-        "backgroundColor": "rgba(255,255,255,0.1)",
+        "backgroundColor": "rgba(255,255,255,0.85)",
         "borderRadius": "12px",
         "padding": "20px"
     }, children=[
@@ -60,13 +60,14 @@ app.layout = html.Div(style=background_style, children=[
 
     html.Br(),
 
-
     dbc.Row([
         dbc.Col([
             dbc.Label("Zimmeranzahl"),
-            dcc.Slider(
-                id='zimmer', min=1, max=4.5, step=0.5, value=2.5,
-                marks={i: str(i, tooltip={"always_visible": False, "placement": "bottom"}, className="bg-white") for i in [1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5]}
+            dcc.Slider(id='zimmer', min=1, max=4.5, step=0.5, value=2.5,
+                marks={i: str(i, tooltip={"always_visible": False, "placement": "bottom"}, className="bg-white",
+                marks={i: str(i) for i in [1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5, 5.5, 6, 6.5]},
+                tooltip={"always_visible": False, "placement": "bottom"},
+                style={"backgroundColor": "white"}) for i in [1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5]}
             )
         ]),
         dbc.Col([dbc.Label("Fläche (m²)"), dbc.Input(id='flaeche', type='number', value=60)])
@@ -83,7 +84,7 @@ app.layout = html.Div(style=background_style, children=[
                 value=[], id="glasfaser", switch=True
             )
         ]),
-        dbc.Col([dbc.Label("Anzahl Eigentümer"), dbc.Input(id='eigentumer', type='number', value=4)])
+        dbc.Col([dbc.Label("Anzahl Eigentümer"), dbc.Input(id='eigentumer', type='number', value=10)])
     ]),
 
     html.Br(),
