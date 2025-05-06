@@ -42,7 +42,6 @@ app.layout = dbc.Container([
     html.Br(),
 
     dbc.Row([
-        dbc.Col([dbc.Label("Ort"), dbc.Input(id='ort', type='text', placeholder='z.B. Basel')]),
         dbc.Col([
             dbc.Label("Zimmeranzahl"),
             dcc.Slider(
