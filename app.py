@@ -65,11 +65,11 @@ app.layout = html.Div(style=background_style, children=[
             dbc.Row([
                 dbc.Col([
                     dbc.Label("Zimmeranzahl"),
-                    dcc.Slider(
-                        id='zimmer', min=1, max=6.5, step=0.5, value=2.5,
-                        marks={i: str(i) for i in [1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5, 5.5, 6, 6.5]},
-                        tooltip={"always_visible": False, "placement": "bottom"},
-                        style={"backgroundColor": "white"}
+                    dcc.Dropdown(
+                        id='zimmer',
+                        options=[{"label": str(z), "value": z} for z in [1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5, 5.5, 6, 6.5]],
+                        value=2.5,
+                        placeholder="Zimmeranzahl auswählen"
                     )
                 ]),
                 dbc.Col([
