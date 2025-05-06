@@ -24,7 +24,7 @@ app = dash.Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP])
 app.title = "Wohnungsvergleich"
 
 background_style = {
-    "backgroundImage": "url('https://images.unsplash.com/photo-1508780709619-79562169bc64?auto=format&fit=crop&w=1920&q=60')",
+    "backgroundImage": "url('assets/woods.jpg')",
     "backgroundSize": "cover",
     "backgroundRepeat": "no-repeat",
     "backgroundPosition": "center",
