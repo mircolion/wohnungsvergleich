@@ -24,7 +24,7 @@ app = dash.Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP])
 
 # App Layout
 app.layout = dbc.Container([
-    html.H1("Wohnungsvergleich mit Sanierungsbewertung"),
+    html.H1("Wohnungsbewertung"),
     html.Hr(),
 
     # Bezirkswahl
