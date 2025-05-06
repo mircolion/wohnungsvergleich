@@ -80,7 +80,7 @@ app.layout = html.Div(style=background_style, children=[
                 value=[], id="glasfaser", switch=True
             )
         ]),
-        dbc.Col([dbc.Label("Anzahl Eigentümer"), dbc.Input(id='eigentumer', type='number', value=10)])
+        dbc.Col([dbc.Label("Anzahl Eigentümer"), dbc.Input(id='eigentumer', type='number', value=4)])
     ]),
 
     html.Br(),
