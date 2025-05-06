@@ -36,7 +36,8 @@ background_style = {
 # App Layout
 app.layout = html.Div(style=background_style, children=[
     html.Div(style={
-        "backgroundColor": "rgba(255,255,255,0.85)",
+        "backgroundBlendMode": "overlay",
+        "backgroundColor": "rgba(255,255,255,0.1)",
         "borderRadius": "12px",
         "padding": "20px"
     }, children=[
